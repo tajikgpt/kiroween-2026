@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Тесты биллинга после задачи",
+      "trigger": "PostTaskExec",
+      "description": "Прогоняет оба набора тестов после завершения задачи. Инвариант «баланс + резервы == сумма реестра» ломается незаметно, и поймать это можно только прогоном, а не чтением диффа.",
+      "action": {
+        "type": "command",
+        "command": "sh -c 'cd kiroween-2026/src 2>/dev/null || cd soulex || exit 0; php cli/test_billing.php | tail -2; php cli/test_concurrency.php | tail -2'",
+        "timeout": 300
+      }
+    }
+  ]
+}

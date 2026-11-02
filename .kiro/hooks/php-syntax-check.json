@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Проверка синтаксиса PHP при сохранении",
+      "trigger": "PostFileSave",
+      "description": "Запускает php -l для сохранённого файла. Ошибка синтаксиса в биллинге, выгруженная на сервер, означает 500 на каждом запросе клиента, поэтому проверка идёт сразу при сохранении, а не перед выгрузкой.",
+      "matcher": "\\.php$",
+      "action": {
+        "type": "command",
+        "command": "python3 -c \"\nimport json,subprocess,sys\nd=json.load(sys.stdin)\np=(d.get('filePath') or d.get('file_path') or '')\nif not p.endswith('.php'): sys.exit(0)\nr=subprocess.run(['php','-l',p],capture_output=True,text=True)\nif r.returncode!=0:\n    print(r.stdout.strip() or r.stderr.strip(), file=sys.stderr); sys.exit(2)\nprint('php -l: синтаксис в порядке')\n\"",
+        "timeout": 30
+      }
+    }
+  ]
+}
