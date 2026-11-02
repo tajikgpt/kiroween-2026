@@ -43,7 +43,7 @@ foreach ($sxRoots as $candidate) {
 if ($sxRoot === null) {
     http_response_code(503);
     header('Content-Type: text/plain; charset=utf-8');
-    exit("Soulex: приватная часть не найдена.\nПроверены: " . implode(', ', $sxRoots) . "\n");
+    exit("TajikGPT: приватная часть не найдена.\nПроверены: " . implode(', ', $sxRoots) . "\n");
 }
 
 define('SX_ROOT', $sxRoot);

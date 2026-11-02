@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — хранилище на файлах.
+ * TajikGPT — хранилище на файлах.
  *
  * Без MySQL, но с гарантиями, которых у flat-file обычно нет.
  *
@@ -381,7 +381,7 @@ function sx_user_load(int $id, bool $reconcile = true): ?array
     $u['balance_tokens'] = max(0, (int) $u['balance_tokens']);
     $u['ledger_offset']  = (int) @filesize(sx_path("ledger/{$id}.jsonl"));
 
-    error_log("[soulex] баланс пользователя {$id} досчитан по реестру: применено {$applied} записей");
+    error_log("[tajikgpt] баланс пользователя {$id} досчитан по реестру: применено {$applied} записей");
     sx_write_json(sx_user_file($id), $u);
 
     return $u;

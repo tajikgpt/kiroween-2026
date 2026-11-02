@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — биллинг токенов на файловом хранилище.
+ * TajikGPT — биллинг токенов на файловом хранилище.
  *
  * Правила:
  *
@@ -122,12 +122,12 @@ function sx_list_models(): array
             'id'       => $id,
             'object'   => 'model',
             'created'  => 1762000000,
-            'owned_by' => 'soulex',
+            'owned_by' => 'tajikgpt',
             'sort'     => (int) ($m['sort'] ?? 999),
 
             // Расширение вне спецификации OpenAI. Стандартные SDK его
             // игнорируют, витрина цен и кабинет читают отсюда.
-            'soulex'   => [
+            'tajikgpt'   => [
                 'title'           => $m['title'],
                 'description'     => $m['description'] ?? null,
                 'coefficient'     => round((int) $m['coef_milli'] / 1000, 3),
@@ -289,7 +289,7 @@ function sx_reap_stale_reservations(int $userId): int
 
         sx_user_save($u);
 
-        error_log("[soulex] пользователю {$userId} возвращено {$freed} т из {$dropped} зависших резервов");
+        error_log("[tajikgpt] пользователю {$userId} возвращено {$freed} т из {$dropped} зависших резервов");
 
         return $freed;
     });
@@ -458,7 +458,7 @@ function sx_settle(
 
         if ($shortfall > 0) {
             error_log(sprintf(
-                '[soulex] недобор списания: запрос %s, модель %s, нужно %d, списано %d',
+                '[tajikgpt] недобор списания: запрос %s, модель %s, нужно %d, списано %d',
                 $requestId, $model['public_id'], $charged, $actual
             ));
         }

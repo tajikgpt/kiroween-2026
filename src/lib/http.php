@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — HTTP-ответы в формате OpenAI.
+ * TajikGPT — HTTP-ответы в формате OpenAI.
  *
  * Совместимость обязательна до буквы: продукт в том, что клиент
  * направляет на нас свой Claude Code, Cursor или openai-python и ничего

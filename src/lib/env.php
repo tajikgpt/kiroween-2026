@@ -66,7 +66,7 @@ function sx_load_env(?string $path = null): bool
         return true;
     }
 
-    error_log('[soulex] .env не найден; проверены: ' . implode(', ', $candidates));
+    error_log('[tajikgpt] .env не найден; проверены: ' . implode(', ', $candidates));
     return false;
 }
 

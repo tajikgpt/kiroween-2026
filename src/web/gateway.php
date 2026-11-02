@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — шлюз. Говорит на двух протоколах.
+ * TajikGPT — шлюз. Говорит на двух протоколах.
  *
  * OpenAI:
  *   GET  /v1/models
@@ -92,7 +92,7 @@ function sx_upstream_failure(
             // Это наша ошибка настройки, а не клиента: в каталоге стоит
             // модель, которой у провайдера больше нет. Клиенту про это
             // знать нечего, но в журнал надо написать громко.
-            error_log("[soulex] НАСТРОЙКА: апстрим {$model['upstream_id']} у провайдера"
+            error_log("[tajikgpt] НАСТРОЙКА: апстрим {$model['upstream_id']} у провайдера"
                 . " {$model['provider_slug']} не существует — проверить config/catalog.php");
             return [
                 "Модель {$modelId} временно недоступна. Попробуйте другую: GET /v1/models",
@@ -173,7 +173,7 @@ if ($rawKey === '') {
 try {
     $auth = sx_resolve_key($rawKey);
 } catch (Throwable $e) {
-    error_log('[soulex] хранилище недоступно при проверке ключа: ' . $e->getMessage());
+    error_log('[tajikgpt] хранилище недоступно при проверке ключа: ' . $e->getMessage());
     sx_error('Сервис временно недоступен', 503, 'api_error', 'service_unavailable');
 }
 
@@ -237,7 +237,7 @@ $postPaths = [
     '/v1/messages', '/messages', '/v1/messages/count_tokens',
 ];
 if ($method !== 'POST' || !in_array($uri, $postPaths, true)) {
-    sx_error('Эндпоинт не найден. Документация: https://soulex.cc/docs', 404, 'invalid_request_error', 'not_found');
+    sx_error('Эндпоинт не найден. Документация: https://tajikgpt.com/docs', 404, 'invalid_request_error', 'not_found');
 }
 
 $raw   = file_get_contents('php://input') ?: '';
@@ -341,7 +341,7 @@ if (!sx_key_allows_model($key, $modelId)) {
     sx_error(
         "Ключ «{$key['name']}» ограничен моделями: " . implode(', ', $allowed)
             . ". Модель {$modelId} в список не входит."
-            . ' Снять ограничение: https://soulex.cc/keys',
+            . ' Снять ограничение: https://tajikgpt.com/keys',
         403,
         'permission_error',
         'model_not_allowed',
@@ -384,7 +384,7 @@ if ($uri === '/v1/messages/count_tokens') {
 
 // Дневной предохранитель по закупке у провайдера
 if (!sx_provider_within_cap($model)) {
-    error_log("[soulex] дневной лимит закупки исчерпан: {$model['provider_slug']}");
+    error_log("[tajikgpt] дневной лимит закупки исчерпан: {$model['provider_slug']}");
     sx_error(
         'Модель временно недоступна. Попробуйте другую или повторите позже.',
         503,
@@ -397,7 +397,7 @@ if (!sx_provider_within_cap($model)) {
 try {
     sx_reap_stale_reservations($user['id']);
 } catch (Throwable $e) {
-    error_log('[soulex] уборка резервов не удалась: ' . $e->getMessage());
+    error_log('[tajikgpt] уборка резервов не удалась: ' . $e->getMessage());
 }
 
 // -----------------------------------------------------------------------------
@@ -465,12 +465,12 @@ try {
         $detail['coefficient'] = round((int) $model['coef_milli'] / 1000, 3);
     }
 
-    $detail['topup_url'] = 'https://soulex.cc/topup';
+    $detail['topup_url'] = 'https://tajikgpt.com/topup';
 
     sx_error(
         "Недостаточно токенов: нужно {$e->required}, на балансе {$e->available}."
             . $hint
-            . ' Пополнить: https://soulex.cc/topup',
+            . ' Пополнить: https://tajikgpt.com/topup',
         402,
         'insufficient_quota',
         'insufficient_tokens',
@@ -479,7 +479,7 @@ try {
 } catch (SxKeyBudgetExceeded $e) {
     sx_error($e->getMessage(), 402, 'insufficient_quota', 'key_budget_exceeded');
 } catch (Throwable $e) {
-    error_log('[soulex] резервирование не удалось: ' . $e->getMessage());
+    error_log('[tajikgpt] резервирование не удалось: ' . $e->getMessage());
     sx_error('Сервис временно недоступен', 503, 'api_error', 'service_unavailable');
 }
 
@@ -640,7 +640,7 @@ if ($stream) {
     // Провайдер не прислал usage — считаем по тексту с запасом,
     // иначе запрос уйдёт бесплатно за наш счёт.
     if ($tokensIn === 0 && $tokensOut === 0) {
-        error_log("[soulex] провайдер {$model['provider_slug']} не прислал usage на стриме");
+        error_log("[tajikgpt] провайдер {$model['provider_slug']} не прислал usage на стриме");
         $tokensIn  = $estIn;
         $tokensOut = sx_fallback_token_count($res['content']);
     }
@@ -703,7 +703,7 @@ if ($stream) {
                 'input_tokens'  => $tokensIn,
                 'output_tokens' => $tokensOut,
             ],
-            'soulex' => ['charged_tokens' => $charged, 'request_id' => $requestId],
+            'tajikgpt' => ['charged_tokens' => $charged, 'request_id' => $requestId],
         ]);
 
         $sse('message_stop', ['type' => 'message_stop']);
@@ -723,7 +723,7 @@ if ($stream) {
                 'completion_tokens' => $tokensOut,
                 'total_tokens'      => $tokensIn + $tokensOut,
             ],
-            'soulex'  => ['charged_tokens' => $charged, 'request_id' => $requestId],
+            'tajikgpt'  => ['charged_tokens' => $charged, 'request_id' => $requestId],
         ], JSON_UNESCAPED_UNICODE) . "\n\n";
         echo "data: [DONE]\n\n";
         sx_sse_flush();
@@ -736,7 +736,7 @@ if ($stream) {
     try {
         sx_settle($requestId, $model, $tokensIn, $tokensOut, $cached, $res['latency_ms'], $user['id']);
     } catch (Throwable $e) {
-        error_log("[soulex] расчёт не удался, запрос {$requestId}: " . $e->getMessage());
+        error_log("[tajikgpt] расчёт не удался, запрос {$requestId}: " . $e->getMessage());
     }
     exit;
 }
@@ -760,7 +760,7 @@ $toolCalls = $data['choices'][0]['message']['tool_calls'] ?? [];
 $toolCalls = is_array($toolCalls) ? $toolCalls : [];
 
 if ($tokensIn === 0 && $tokensOut === 0) {
-    error_log("[soulex] провайдер {$model['provider_slug']} не прислал usage");
+    error_log("[tajikgpt] провайдер {$model['provider_slug']} не прислал usage");
     $tokensIn  = $estIn;
     // Аргументы инструментов — тоже выход, и его надо посчитать, иначе
     // ответ из одних вызовов уйдёт почти бесплатно.
@@ -772,7 +772,7 @@ if ($tokensIn === 0 && $tokensOut === 0) {
 try {
     $charged = sx_settle($requestId, $model, $tokensIn, $tokensOut, $cached, $res['latency_ms'], $user['id']);
 } catch (Throwable $e) {
-    error_log("[soulex] расчёт не удался, запрос {$requestId}: " . $e->getMessage());
+    error_log("[tajikgpt] расчёт не удался, запрос {$requestId}: " . $e->getMessage());
     $charged = sx_charge_tokens($model, $tokensIn, $tokensOut);
 }
 
@@ -798,7 +798,7 @@ if ($isAnthropic) {
             'input_tokens'  => $tokensIn,
             'output_tokens' => $tokensOut,
         ],
-        'soulex' => [
+        'tajikgpt' => [
             'charged_tokens' => $charged,
             'balance_tokens' => max(0, $user['balance_tokens'] - $charged),
             'request_id'     => $requestId,
@@ -808,8 +808,8 @@ if ($isAnthropic) {
     // Если имя модели сопоставили, говорим об этом прямо: иначе человек
     // будет искать, почему в ответе стоит не то, что он просил.
     if ($modelAliased) {
-        $payloadOut['soulex']['requested_model'] = $requestedModel;
-        $payloadOut['soulex']['note'] =
+        $payloadOut['tajikgpt']['requested_model'] = $requestedModel;
+        $payloadOut['tajikgpt']['note'] =
             "Запрошена модель {$requestedModel}; она у нас не предоставляется. "
             . "Запрос обслужен моделью {$modelId}. "
             . 'Чтобы выбрать модель самому, укажите её ID в ANTHROPIC_MODEL.';
@@ -841,7 +841,7 @@ sx_json([
         'completion_tokens' => $tokensOut,
         'total_tokens'      => $tokensIn + $tokensOut,
     ],
-    'soulex'  => [
+    'tajikgpt'  => [
         'charged_tokens' => $charged,
         'balance_tokens' => max(0, $user['balance_tokens'] - $charged),
         'request_id'     => $requestId,

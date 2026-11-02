@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — совместимость с Messages API от Anthropic.
+ * TajikGPT — совместимость с Messages API от Anthropic.
  *
  * Зачем это нужно: Claude Code говорит только на протоколе Anthropic
  * (POST /v1/messages), а не на OpenAI Chat Completions. Без этого

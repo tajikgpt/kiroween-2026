@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — обращение к провайдеру.
+ * TajikGPT — обращение к провайдеру.
  *
  * Ядро взято из рабочего кода tajikgpt (api.php:309-730) — там стриминг уже
  * доведён до состояния, когда он работает на этом самом шаред-хостинге.
@@ -74,13 +74,13 @@ function sx_upstream_call(array $model, array $payload): array
     $latency = (int) round((microtime(true) - $t0) * 1000);
 
     if ($curlErr !== '' || $response === false) {
-        error_log("[soulex] провайдер {$model['provider_slug']} недоступен: {$curlErr}");
+        error_log("[tajikgpt] провайдер {$model['provider_slug']} недоступен: {$curlErr}");
         return ['ok' => false, 'error' => 'upstream_unreachable', 'status' => 503, 'latency_ms' => $latency];
     }
 
     $data = json_decode((string) $response, true);
     if (!is_array($data)) {
-        error_log("[soulex] провайдер {$model['provider_slug']} вернул не-JSON, код {$httpCode}");
+        error_log("[tajikgpt] провайдер {$model['provider_slug']} вернул не-JSON, код {$httpCode}");
         return ['ok' => false, 'error' => 'upstream_bad_response', 'status' => 502, 'latency_ms' => $latency];
     }
 
@@ -88,7 +88,7 @@ function sx_upstream_call(array $model, array $payload): array
         $msg = is_array($data['error'] ?? null)
             ? (string) ($data['error']['message'] ?? 'ошибка провайдера')
             : (string) ($data['error'] ?? 'ошибка провайдера');
-        error_log("[soulex] провайдер {$model['provider_slug']} ошибка {$httpCode}: {$msg}");
+        error_log("[tajikgpt] провайдер {$model['provider_slug']} ошибка {$httpCode}: {$msg}");
         return [
             'ok'     => false,
             'error'  => 'upstream_error',
@@ -243,7 +243,7 @@ function sx_upstream_stream(array $model, array $payload, callable $onDelta): ar
     $error = null;
     if ($httpCode >= 400 && $state['full'] === '') {
         $error = 'upstream_http_' . $httpCode;
-        error_log("[soulex] провайдер {$model['provider_slug']} отказал на стриме, код {$httpCode}");
+        error_log("[tajikgpt] провайдер {$model['provider_slug']} отказал на стриме, код {$httpCode}");
     } elseif ($err !== '' && $state['full'] === '') {
         // Обрыв на середине ответа ошибкой не считаем: текст клиент уже увидел
         $error = $err;

@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — проверка биллинга.
+ * TajikGPT — проверка биллинга.
  *
  * Запуск:  php cli/test_billing.php
  *
@@ -11,7 +11,7 @@
 declare(strict_types=1);
 
 // Временный каталог данных до загрузки хранилища
-$tmp = sys_get_temp_dir() . '/soulex_test_' . getmypid();
+$tmp = sys_get_temp_dir() . '/tajikgpt_test_' . getmypid();
 putenv("DATA_DIR={$tmp}");
 $_ENV['DATA_DIR'] = $tmp;
 
@@ -146,12 +146,12 @@ foreach (sx_catalog()['packages'] as $slug => $p) {
 // =============================================================================
 echo "\n=== Хранилище: пользователь и ключ ===\n";
 
-$u = sx_user_create('test@soulex.cc', 'Тест');
+$u = sx_user_create('test@tajikgpt.com', 'Тест');
 check('пользователь создан', (int) $u['id'], 1);
 check('баланс пустой',       (int) $u['balance_tokens'], 0);
 
 // Повторное создание не дублирует
-$u2 = sx_user_create('test@soulex.cc');
+$u2 = sx_user_create('test@tajikgpt.com');
 check('повторное создание возвращает того же', (int) $u2['id'], 1);
 
 $key = sx_issue_key(1, 'main');
@@ -214,7 +214,7 @@ check('баланс восстановлен', (int) sx_user_load(1)['balance_to
 check('резервов не осталось', (int) sx_user_load(1)['reserved_tokens'], 0);
 
 echo "\n=== Нехватка баланса ===\n";
-$small = sx_user_create('small@soulex.cc');
+$small = sx_user_create('small@tajikgpt.com');
 sx_credit_tokens((int) $small['id'], 100, 'purchase', 'SX_SMALL');
 $caught = false;
 try {
@@ -227,7 +227,7 @@ check_true('запрос отклонён', $caught, 'иначе уйдём в �
 check('баланс не тронут', (int) sx_user_load((int) $small['id'])['balance_tokens'], 100);
 
 echo "\n=== Бесплатная модель требует баланса ===\n";
-$zero = sx_user_create('zero@soulex.cc');
+$zero = sx_user_create('zero@tajikgpt.com');
 $caught = false;
 try {
     sx_reserve((int) $zero['id'], null, $free, 100, 100);

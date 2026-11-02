@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — вход и сессии.
+ * TajikGPT — вход и сессии.
  *
  * Вход по одноразовому коду на почту. Пароля нет намеренно: нет пароля —
  * нет его утечки, нет восстановления, нет повторного использования чужого
@@ -212,8 +212,8 @@ function sx_otp_verify(string $email, string $code): array
  */
 function sx_send_code(string $email, string $code): bool
 {
-    $site = 'Soulex';
-    $from = 'no-reply@soulex.cc';
+    $site = 'TajikGPT';
+    $from = 'no-reply@tajikgpt.com';
 
     $subject = '=?UTF-8?B?' . base64_encode("{$code} — код входа в {$site}") . '?=';
 
@@ -221,20 +221,20 @@ function sx_send_code(string $email, string $code): bool
           . "    {$code}\n\n"
           . "Код действует 10 минут. Если вы не запрашивали вход — просто\n"
           . "проигнорируйте это письмо.\n\n"
-          . "https://soulex.cc/\n";
+          . "https://tajikgpt.com/\n";
 
     $headers = implode("\r\n", [
         "From: {$site} <{$from}>",
         "Reply-To: {$from}",
         'Content-Type: text/plain; charset=UTF-8',
         'Content-Transfer-Encoding: 8bit',
-        'X-Mailer: Soulex',
+        'X-Mailer: TajikGPT',
     ]);
 
     $sent = @mail($email, $subject, $body, $headers, "-f{$from}");
 
     if (!$sent) {
-        error_log("[soulex] письмо с кодом не ушло: {$email}");
+        error_log("[tajikgpt] письмо с кодом не ушло: {$email}");
         @file_put_contents(
             sx_path('otp_fallback.log'),
             gmdate('c') . " {$email} {$code}\n",

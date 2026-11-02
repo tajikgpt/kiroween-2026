@@ -1,6 +1,6 @@
 <?php
 /**
- * Soulex — проверка параллельных списаний.
+ * TajikGPT — проверка параллельных списаний.
  *
  * Это главный тест файлового хранилища. Он отвечает на вопрос, из-за
  * которого обычно и отказываются от txt: теряются ли списания, когда
@@ -79,7 +79,7 @@ if (($argv[1] ?? '') === 'naive-worker') {
 // Режим запуска
 // =============================================================================
 
-$tmp = sys_get_temp_dir() . '/soulex_conc_' . getmypid();
+$tmp = sys_get_temp_dir() . '/tajikgpt_conc_' . getmypid();
 putenv("DATA_DIR={$tmp}");
 $_ENV['DATA_DIR'] = $tmp;
 
@@ -172,7 +172,7 @@ $total       = $WORKERS * $ROUNDS;
 // а не поведение при нехватке
 $initial = $perRequest * $total * 2;
 
-$u = sx_user_create('conc@soulex.cc');
+$u = sx_user_create('conc@tajikgpt.com');
 sx_credit_tokens((int) $u['id'], $initial, 'purchase', 'SX_CONC');
 $key  = sx_issue_key((int) $u['id'], 'conc');
 $auth = sx_resolve_key($key);
@@ -199,7 +199,7 @@ $errors          = [];
 foreach ($results as $i => $r) {
     // Предупреждение об отсутствующем .env в тестах ожидаемо: боевые
     // ключи здесь не нужны, запросов к провайдеру тест не делает.
-    $err = trim(preg_replace('/^\[soulex\] \.env не найден.*$/m', '', $r['err']) ?? '');
+    $err = trim(preg_replace('/^\[tajikgpt\] \.env не найден.*$/m', '', $r['err']) ?? '');
     if ($err !== '') {
         $errors[] = "процесс {$i}: " . substr($err, 0, 200);
     }
